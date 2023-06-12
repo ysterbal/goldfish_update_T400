@@ -1,0 +1,113 @@
+/*
+ * Copyright (c) 2014-2015 MediaTek Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include "mt8516_som_base.dtsi"
+
+&i2c0 {
+	status = "okay";
+};
+
+&i2c1 {
+	status = "okay";
+};
+
+&i2c2 {
+	status = "okay";
+};
+
+&keypad {
+	pinctrl-names = "default";
+	pinctrl-0 = <&kpd_pins_default>;
+	mediatek,kpd-hw-init-map = <115 113 0 0 0 0 0 0 0 59 164 0 0 0 0 0 0 0 0 0 0 0 0 0
+			0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+			0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 >;
+	status = "okay";
+};
+
+&pio {
+	pinctrl-names = "default";
+	pinctrl-0 = <&state_default>;
+
+	state_default:pinconf_default {
+	};
+
+	aud_pins_default: audiodefault {
+		pins_cmd_dat {
+			pinmux = <MT8167_PIN_36_MRG_CLK__FUNC_I2S0_BCK>,
+				<MT8167_PIN_37_MRG_SYNC__FUNC_I2S0_LRCK>,
+				<MT8167_PIN_38_MRG_DI__FUNC_I2S0_DI>,
+				<MT8167_PIN_20_EINT20__FUNC_I2S3_DO>,
+				<MT8167_PIN_25_EINT25__FUNC_I2S_8CH_MCK>,
+				<MT8167_PIN_55_I2S_DATA_IN__FUNC_I2S_8CH_DO1>,
+				<MT8167_PIN_56_I2S_LRCK__FUNC_I2S_8CH_LRCK>,
+				<MT8167_PIN_57_I2S_BCK__FUNC_I2S_8CH_BCK>,
+				<MT8167_PIN_1_EINT1__FUNC_I2S2_DI>,
+				<MT8167_PIN_100_CMDAT0__FUNC_TDM_RX_MCK>,
+				<MT8167_PIN_101_CMDAT1__FUNC_TDM_RX_BCK>,
+				<MT8167_PIN_16_EINT16__FUNC_TDM_RX_LRCK>,
+				<MT8167_PIN_103_CMPCLK__FUNC_TDM_RX_DI>;
+			drive-strength = <MTK_DRIVE_4mA>;
+		};
+
+		pins_tas5782m_reset_mute {
+			pinmux = <MT8167_PIN_107_MSDC1_DAT1__FUNC_GPIO107>,
+				<MT8167_PIN_108_MSDC1_DAT2__FUNC_GPIO108>;
+			output-high;
+		};
+
+		pins_tlv320adc3101_reset {
+			pinmux = <MT8167_PIN_24_EINT24__FUNC_GPIO24>;
+			output-high;
+		};
+	};
+
+	kpd_pins_default: kpddefault {
+		pins_cols {
+			pinmux = <MT8167_PIN_42_KPCOL0__FUNC_KPCOL0>,
+				 <MT8167_PIN_43_KPCOL1__FUNC_KPCOL1>;
+			input-enable;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_rows {
+			pinmux = <MT8167_PIN_40_KPROW0__FUNC_KPROW0>,
+				 <MT8167_PIN_41_KPROW1__FUNC_KPROW1>;
+			output-low;
+			bias-disable;
+		};
+	};
+};
+
+&spi {
+	status = "okay";
+};
+
+&uart0 {
+	status="okay";
+};
+
+&usb0 {
+	pinctrl-names = "iddig_irq_init", "drvvbus_init", "drvvbus_low", "drvvbus_high";
+	pinctrl-0 = <&usb0_iddig>;
+	pinctrl-1 = <&usb0_drvvbus>;
+	pinctrl-2 = <&usb0_drvvbus_low>;
+	pinctrl-3 = <&usb0_drvvbus_high>;
+	status = "okay";
+	drvvbus_gpio = <&pio 18 2>;
+	iddig_gpio = <&pio 19 2>;
+};
+
+&usb1 {
+	status = "okay";
+};

@@ -1,0 +1,291 @@
+/*
+ * Copyright (c) 2014-2015 MediaTek Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include "mt8167s_ref_base.dtsi"
+
+/ {
+	panel: panel@0 {
+		compatible = "ili9881c,ili9881c_hd720_td_tchd5031_6b_dsi_vdo";
+		gpio_lcd_rst = <&pio 66 0>;
+		reg-lcm-supply = <&mt6392_vgp2_reg>;
+		status = "okay";
+	};
+};
+
+&i2c0 {
+	status = "okay";
+
+	cap_touch@5d {
+		compatible = "mediatek,GT9157";
+		reg = <0x5d>;
+		interrupt-parent = <&pio>;
+		interrupts = <8 IRQ_TYPE_EDGE_FALLING>;
+		int-gpio = <&pio 8 0>;
+		rst-gpio = <&pio 9 0>;
+	};
+};
+
+&i2c1 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	kd_camera_hw1@36 {
+		compatible = "mediatek,camera_main";
+		reg = <0x36>;
+	};
+};
+
+&i2c2 {
+	status = "okay";
+};
+
+/* Main Cam */
+&kd_camera_hw1 {
+	reg-vcama-supply = <&mt6392_vcama_reg>;		/* AVDD */
+	reg-vcamd-supply = <&mt6392_vcamd_reg>;		/* DVDD */
+	reg-vcamio-supply = <&mt6392_vcamio_reg>;	/* DOVDD */
+	reg-vcamaf-supply = <&mt6392_vcamaf_reg>;	/* AFVDD */
+
+	pinctrl-names = "default",
+		"cam_mclk", "cam_gpio84", "cam_gpio85",
+		"cam_gpio86", "cam_gpio87", "cam_gpio88",  "cam_gpio89";
+
+	pinctrl-0 = <&camera_pins_default>;
+	pinctrl-1 = <&camera_pins_cam_mclk>;
+	pinctrl-2 = <&camera_pins_gpio84>;
+	pinctrl-3 = <&camera_pins_gpio85>;
+	pinctrl-4 = <&camera_pins_gpio86>;
+	pinctrl-5 = <&camera_pins_gpio87>;
+	pinctrl-6 = <&camera_pins_gpio88>;
+	pinctrl-7 = <&camera_pins_gpio89>;
+
+	cam0_rst = <&pio 10 0>;
+	cam0_pdn = <&pio 7 0>;
+	status = "okay";
+};
+
+&keypad {
+	pinctrl-names = "default";
+	pinctrl-0 = <&kpd_pins_default>;
+	mediatek,kpd-hw-init-map = <115 113 0 0 0 0 0 0 0 59 164 0 0 0 0 0 0 0 0 0 0 0 0 0
+			0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+			0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 >;
+	status = "okay";
+};
+
+&pio {
+	pinctrl-names = "default";
+	pinctrl-0 = <&state_default>;
+
+	state_default:pinconf_default {
+	};
+
+	aud_pins_default: audiodefault {
+		pins_cmd_dat {
+			pinmux = <MT8167_PIN_36_MRG_CLK__FUNC_I2S0_BCK>,
+				<MT8167_PIN_37_MRG_SYNC__FUNC_I2S0_LRCK>,
+				<MT8167_PIN_38_MRG_DI__FUNC_I2S0_DI>,
+				<MT8167_PIN_20_EINT20__FUNC_I2S3_DO>,
+				<MT8167_PIN_25_EINT25__FUNC_I2S_8CH_MCK>,
+				<MT8167_PIN_55_I2S_DATA_IN__FUNC_I2S_8CH_DO1>,
+				<MT8167_PIN_56_I2S_LRCK__FUNC_I2S_8CH_LRCK>,
+				<MT8167_PIN_57_I2S_BCK__FUNC_I2S_8CH_BCK>,
+				<MT8167_PIN_1_EINT1__FUNC_I2S2_DI>,
+				<MT8167_PIN_100_CMDAT0__FUNC_TDM_RX_MCK>,
+				<MT8167_PIN_101_CMDAT1__FUNC_TDM_RX_BCK>,
+				<MT8167_PIN_16_EINT16__FUNC_TDM_RX_LRCK>,
+				<MT8167_PIN_103_CMPCLK__FUNC_TDM_RX_DI>;
+			drive-strength = <MTK_DRIVE_4mA>;
+		};
+
+		pins_tas5782m_reset_mute {
+			pinmux = <MT8167_PIN_107_MSDC1_DAT1__FUNC_GPIO107>,
+				<MT8167_PIN_108_MSDC1_DAT2__FUNC_GPIO108>;
+			output-high;
+		};
+
+		pins_tlv320adc3101_reset {
+			pinmux = <MT8167_PIN_24_EINT24__FUNC_GPIO24>;
+			output-high;
+		};
+	};
+
+	/* CAMERA GPIO standardization */
+	/* default mode */
+	camera_pins_default: camdefault {
+		pins_cmd_dat {
+			pinmux = <MT8167_PIN_84_RDN0__FUNC_RDN0>,
+				<MT8167_PIN_85_RDP0__FUNC_RDP0>,
+				<MT8167_PIN_86_RDN1__FUNC_RDN1>,
+				<MT8167_PIN_87_RDP1__FUNC_RDP1>,
+				<MT8167_PIN_88_RCN__FUNC_RCN>,
+				<MT8167_PIN_89_RCP__FUNC_RCP>;
+		};
+	};
+
+	camera_pins_cam_mclk: cam_pin_mclk {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_102_CMMCLK__FUNC_CMMCLK>;
+		};
+	};
+
+	camera_pins_gpio88: cam_pin_gpio88 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_88_RCN__FUNC_RCN>;
+		};
+	};
+
+	camera_pins_gpio89: cam_pin_gpio89 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_89_RCP__FUNC_RCP>;
+		};
+	};
+
+	camera_pins_gpio86: cam_pin_gpio86 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_86_RDN1__FUNC_RDN1>;
+		};
+	};
+
+	camera_pins_gpio87: cam_pin_gpio87 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_87_RDP1__FUNC_RDP1>;
+		};
+	};
+
+	camera_pins_gpio84: cam_pin_gpio84 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_84_RDN0__FUNC_RDN0>;
+		};
+	};
+
+	camera_pins_gpio85: cam_pin_gpio85 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_85_RDP0__FUNC_RDP0>;
+		};
+	};
+
+	CTP_pins_default: eint0default {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_8_EINT8__FUNC_GPIO8>;
+			slew-rate = <0>;
+			bias-disable;
+		};
+	};
+
+	CTP_pins_eint_as_int: eint@0 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_8_EINT8__FUNC_GPIO8>;
+			slew-rate = <0>;
+			bias-disable;
+		};
+	};
+
+	CTP_pins_eint_output0: eintoutput0 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_8_EINT8__FUNC_GPIO8>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
+	CTP_pins_eint_output1: eintoutput1 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_8_EINT8__FUNC_GPIO8>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	CTP_pins_rst_output0: rstoutput0 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_9_EINT9__FUNC_GPIO9>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
+	CTP_pins_rst_output1: rstoutput1 {
+		pins_cmd_dat {
+			pins = <MT8167_PIN_9_EINT9__FUNC_GPIO9>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	kpd_pins_default: kpddefault {
+		pins_cols {
+			pinmux = <MT8167_PIN_42_KPCOL0__FUNC_KPCOL0>,
+				 <MT8167_PIN_43_KPCOL1__FUNC_KPCOL1>;
+			input-enable;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		pins_rows {
+			pinmux = <MT8167_PIN_40_KPROW0__FUNC_KPROW0>,
+				 <MT8167_PIN_41_KPROW1__FUNC_KPROW1>;
+			output-low;
+			bias-disable;
+		};
+	};
+};
+
+&spi {
+	status = "okay";
+};
+
+&touch {
+	vtouch-supply = <&mt6392_vmc_reg>;
+	tpd-resolution = <720 1280>;
+	use-tpd-button = <0>;
+	tpd-key-num = <4>;
+	tpd-key-local= <139 172 158 0>;
+	tpd-key-dim-local = <60 850 50 30 180 850 50 30 300 850 50 30 420 850 50 30>;
+	tpd-max-touch-num = <5>;
+	tpd-filter-enable = <1>;
+	tpd-filter-pixel-density = <124>;
+	tpd-filter-custom-prameters = <0 0 0 0 0 0 0 0 0 0 0 0>;
+	tpd-filter-custom-speed = <0 0 0>;
+	pinctrl-names = "default", "state_eint_as_int", "state_eint_output0", "state_eint_output1",
+		"state_rst_output0", "state_rst_output1";
+	pinctrl-0 = <&CTP_pins_default>;
+	pinctrl-1 = <&CTP_pins_eint_as_int>;
+	pinctrl-2 = <&CTP_pins_eint_output0>;
+	pinctrl-3 = <&CTP_pins_eint_output1>;
+	pinctrl-4 = <&CTP_pins_rst_output0>;
+	pinctrl-5 = <&CTP_pins_rst_output1>;
+	status = "okay";
+};
+
+&uart0 {
+	status="okay";
+};
+
+&usb0 {
+	pinctrl-names = "iddig_irq_init", "drvvbus_init", "drvvbus_low", "drvvbus_high";
+	pinctrl-0 = <&usb0_iddig>;
+	pinctrl-1 = <&usb0_drvvbus>;
+	pinctrl-2 = <&usb0_drvvbus_low>;
+	pinctrl-3 = <&usb0_drvvbus_high>;
+	usb-power-supply = <&mt6392_vusb_reg>;
+
+	drvvbus_gpio = <&pio 18 2>;
+	iddig_gpio = <&pio 19 2>;
+
+	status = "okay";
+};
+
+&usb1 {
+	status = "okay";
+};
